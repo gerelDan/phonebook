@@ -32,9 +32,8 @@ while True:
         next
 
 def show_all(my_dict):
-    print("Выводим на экран телефонный справочник")
     table = PrettyTable()
-    columns = ['N'] + list(my_dict[0].keys())
+    columns = ['№'] + list(my_dict[0].keys())
     table.field_names = columns
     rows = [list(row.values()) for row in my_dict]
     for row in range(len(rows)):
@@ -52,14 +51,16 @@ def add_contact(my_dict):
 
 def find_contact(my_dict):
     search_word=input("Введите текст для поиска контакта:\n")
-    search_result=[]
+    result = []
+    return_result=[]
     for item in range(len(my_dict)):
         for i in my_dict[item].values():
             if search_word in i:
+                result.append(my_dict[item])
                 print(my_dict[item])
-                search_result.append(item)
-    print(search_result)
-    return search_result
+                return_result.append(item)
+    show_all(result)
+    return return_result
 
 def change_contact(my_dict,index):
     fields=list(my_dict[0].keys())
