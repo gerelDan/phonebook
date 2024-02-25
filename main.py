@@ -63,14 +63,24 @@ def find_contact(my_dict):
     show_all(result)
     return return_result
 
-def change_contact(my_dict,index):
+def change_contact(my_dict):
     fields=list(my_dict[0].keys())
-    
-    temp_dict=my_dict[index]
-    to_change=int(input("В какое поле вносим изменения: 1. Имя 2. Телефон 3. Комментарий?"))
-    new_value=input("Введите новое значение поля")
-    temp_dict[fields[to_change-1]]=new_value
-    my_dict[index]=temp_dict
+    finder = find_contact(my_dict)
+    while True:
+        try:
+            answer = int(input("Какую из найденых записей нужно изменить?\n"))
+            break
+        except ValueError:
+            print("Нужно ввести номер по порядку")
+            next
+    if answer != 0:
+        index = finder[answer - 1]
+    to_change=int(input('''В какое поле вносим изменения:
+1. Имя
+2. Телефон
+3. Комментарий\n'''))
+    new_value=input("Введите новое значение поля\n")
+    my_dict[index][fields[to_change-1]] = new_value.title()
     with open('phone_numbers.txt', 'w') as file:
         for i in my_dict:
             file.write(f'{i["Имя"]} {i["Телефон"]} {i["Комментарий"]}\n')
@@ -94,7 +104,7 @@ def del_contacts(my_dict):
 #add_contact(my_dict)
 show_all(my_dict)
 #find_contact(my_dict)
-#change_contact(my_dict,1)
+change_contact(my_dict)
 #show_all(my_dict)
-del_contacts(my_dict)
+#del_contacts(my_dict)
 show_all(my_dict)
