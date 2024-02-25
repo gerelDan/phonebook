@@ -1,10 +1,12 @@
-# 1. Показывать все контакты
-# 2. Добавлять контакт
-# 3. Найти контакт
-# 4. Изменять контакт
+# 1. Показывать все контакты!
+# 2. Добавлять контакт!
+# 3. Найти контакт!
+# 4. Изменять контакт!
 # 5. Удалить конаткт
 
 #Имя Номер Коммент
+from prettytable import PrettyTable
+
 my_dict = []
 with open('phone_numbers.txt','r') as file:
     for i in file:
@@ -31,8 +33,13 @@ while True:
 
 def show_all(my_dict):
     print("Выводим на экран телефонный справочник")
-    for i in my_dict:
-        print(i)
+    table = PrettyTable()
+    columns = ['N'] + list(my_dict[0].keys())
+    table.field_names = columns
+    rows = [list(row.values()) for row in my_dict]
+    for row in range(len(rows)):
+        table.add_row([row+1]+ rows[row])
+    print(table)
 
 def add_contact(my_dict):
     name=input("Введите имя:\n").lower()
@@ -66,9 +73,13 @@ def change_contact(my_dict,index):
         for i in my_dict:
             file.write(f'{i["Имя"]} {i["Телефон"]} {i["Комментарий"]}\n')
 
+def del_contacts(my_dict):
+    to_del = find_contact(my_dict)
+    answer = int(input("Какую из найденых записей нужно удалить?\n"))
+
 #show_all(my_dict)
 #add_contact(my_dict)
 show_all(my_dict)
 find_contact(my_dict)
-change_contact(my_dict,1)
-show_all(my_dict)
+#change_contact(my_dict,1)
+#show_all(my_dict)
