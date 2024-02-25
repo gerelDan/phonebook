@@ -25,11 +25,12 @@ print("""Выберите нужный пункт меню:
 
 while True:
     try:
-        menu_item=int(input())
+        menu_item=int(input())-1
         break
     except ValueError:
         print("Вы ввели неверное значение. Выберите пункт из меню")
         next
+    menu
 
 def show_all(my_dict):
     table = PrettyTable()
@@ -64,7 +65,7 @@ def find_contact(my_dict):
 
 def change_contact(my_dict,index):
     fields=list(my_dict[0].keys())
-    print(fields)
+    
     temp_dict=my_dict[index]
     to_change=int(input("В какое поле вносим изменения: 1. Имя 2. Телефон 3. Комментарий?"))
     new_value=input("Введите новое значение поля")
@@ -76,11 +77,24 @@ def change_contact(my_dict,index):
 
 def del_contacts(my_dict):
     to_del = find_contact(my_dict)
-    answer = int(input("Какую из найденых записей нужно удалить?\n"))
+    while True:
+        try:
+            answer = int(input("Какую из найденых записей нужно удалить?\n"))
+            break
+        except ValueError:
+            print("Нужно ввести номер по порядку")
+            next
+    if answer != 0:
+        result = [my_dict.pop(to_del[answer-1])]
+        print(f"Контакт указанный ниже удален")
+        show_all(result)
+
 
 #show_all(my_dict)
 #add_contact(my_dict)
 show_all(my_dict)
-find_contact(my_dict)
+#find_contact(my_dict)
 #change_contact(my_dict,1)
 #show_all(my_dict)
+del_contacts(my_dict)
+show_all(my_dict)
