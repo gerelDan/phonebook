@@ -15,22 +15,40 @@ with open('phone_numbers.txt','r') as file:
 
 print(my_dict)
 
-print("""Выберите нужный пункт меню: 
-1. Показывать все контакты
-2. Добавлять контакт
-3. Найти контакт
-4. Изменять контакт
-5. Удалить контакт
-6. Выход из программы""")
+quest = """Выберите нужный пункт меню: 
+ 1. Показывать все контакты
+ 2. Добавлять контакт
+ 3. Найти контакт
+ 4. Изменять контакт
+ 5. Удалить контакт
+ 6. Выход из программы\n"""
+ 
+# print("""Выберите нужный пункт меню: 
+# 1. Показывать все контакты
+# 2. Добавлять контакт
+# 3. Найти контакт
+# 4. Изменять контакт
+# 5. Удалить контакт
+# 6. Выход из программы""")
 
-while True:
-    try:
-        menu_item=int(input())-1
-        break
-    except ValueError:
-        print("Вы ввели неверное значение. Выберите пункт из меню")
-        next
-    menu
+def questions(quest: str):
+    while True:
+        try:
+            menu_item = int(input(quest)) - 1
+            return menu_item
+        except ValueError:
+            print("Вы ввели неверное значение. Выберите пункт из меню")
+            next
+
+menu_item = questions(quest)
+# while True:
+#     try:
+#         menu_item=int(input())-1
+#         break
+#     except ValueError:
+#         print("Вы ввели неверное значение. Выберите пункт из меню")
+#         next
+
 
 def show_all(my_dict):
     table = PrettyTable()
@@ -42,9 +60,9 @@ def show_all(my_dict):
     print(table)
 
 def add_contact(my_dict):
-    name=input("Введите имя:\n").lower()
-    phone=input("Введите номер телефона:\n").lower()
-    comment=input("Введите комментарий:\n").lower()
+    name=input("Введите имя:\n").title()
+    phone=input("Введите номер телефона:\n").title()
+    comment=input("Введите комментарий:\n").title()
     new_string=f'{name} {phone} {comment}'
     my_dict.append({'Имя':name, 'Телефон':phone, 'Комментарий':comment})
     with open('phone_numbers.txt', 'a+') as file:
@@ -66,19 +84,15 @@ def find_contact(my_dict):
 def change_contact(my_dict):
     fields=list(my_dict[0].keys())
     finder = find_contact(my_dict)
-    while True:
-        try:
-            answer = int(input("Какую из найденых записей нужно изменить?\n"))
-            break
-        except ValueError:
-            print("Нужно ввести номер по порядку")
-            next
+    answer = questions("Какую из найденых записей нужно изменить?\n")
     if answer != 0:
         index = finder[answer - 1]
-    to_change=int(input('''В какое поле вносим изменения:
+
+    quest_to_change = '''В какое поле вносим изменения:
 1. Имя
 2. Телефон
-3. Комментарий\n'''))
+3. Комментарий\n'''
+    to_change = questions(quest_to_change)
     new_value=input("Введите новое значение поля\n")
     my_dict[index][fields[to_change-1]] = new_value.title()
     with open('phone_numbers.txt', 'w') as file:
@@ -87,24 +101,21 @@ def change_contact(my_dict):
 
 def del_contacts(my_dict):
     to_del = find_contact(my_dict)
-    while True:
-        try:
-            answer = int(input("Какую из найденых записей нужно удалить?\n"))
-            break
-        except ValueError:
-            print("Нужно ввести номер по порядку")
-            next
+    answer = questions("Какую из найденых записей нужно удалить?\n")
     if answer != 0:
         result = [my_dict.pop(to_del[answer-1])]
         print(f"Контакт указанный ниже удален")
         show_all(result)
+    with open('phone_numbers.txt', 'w') as file:
+        for i in my_dict:
+            file.write(f'{i["Имя"]} {i["Телефон"]} {i["Комментарий"]}\n')
 
 
 #show_all(my_dict)
 #add_contact(my_dict)
 show_all(my_dict)
 #find_contact(my_dict)
-change_contact(my_dict)
+#change_contact(my_dict)
 #show_all(my_dict)
-#del_contacts(my_dict)
+del_contacts(my_dict)
 show_all(my_dict)
