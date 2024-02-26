@@ -9,6 +9,8 @@ from prettytable import PrettyTable
 import sys
 
 
+PATH = 'phone_numbers.txt'
+
 def start_menu():
     global my_dict
     quest = """Выберите нужный пункт меню: 
@@ -21,12 +23,9 @@ def start_menu():
  7. Выход из программы\n"""
 
     while True:
-        menu_item = questions(quest) + 1
-        print(type(menu_item))
-        print(menu_item)
+        menu_item = questions(quest)
         match menu_item:
             case 1:
-                print('case 1')
                 show_all(my_dict)
             case 2:
                 add_contact()
@@ -44,7 +43,7 @@ def start_menu():
 def questions(quest: str):
     while True:
         try:
-            menu_item = int(input(quest)) - 1
+            menu_item = int(input(quest))
             return menu_item
         except ValueError:
             print("Вы ввели неверное значение. Выберите пункт из меню")
@@ -64,7 +63,6 @@ def add_contact():
     name=input("Введите имя:\n").title()
     phone=input("Введите номер телефона:\n")
     comment=input("Введите комментарий:\n").title()
-    new_string=f'{name} {phone} {comment}'
     my_dict.append({'Имя':name, 'Телефон':phone, 'Комментарий':comment})
     message = f'Контакт с именем {name} успешно добавлен'
     print('-'* len(message))
@@ -74,50 +72,66 @@ def add_contact():
 
 def find_contact() -> list:
     global my_dict
-    search_word=input("Введите текст для поиска контакта:\n").title()
+    search_word=input("Введите текст для поиска контакта:\n").lower()
     result = []
     return_result=[]
     for item in range(len(my_dict)):
         for i in my_dict[item].values():
-            if search_word in i:
+            if search_word in i.lower():
                 result.append(my_dict[item])
                 return_result.append(item)
-    show_all(result)
+    if result:
+        show_all(result)
+    else:
+        print(f'Контактов содержащих "{search_word}" не найдено')
     return return_result
 
 def change_contact():
     global my_dict
-    fields=list(my_dict[0].keys())
+#    fields=list(my_dict[0].keys())
     finder = find_contact()
-    answer = questions("Какую из найденых записей нужно изменить?\n")
-    if answer >= 0 and answer < len(finder):
-        index = finder[answer]
-    temp_dict = my_dict[index].copy()
-    for key, value in temp_dict.items():
-        new_value = input(f'Введите новое значение поля "{key}" Или Enter для пропуска\n')
-        if new_value:
-            temp_dict[key] = new_value
-    show_all([temp_dict])
-    quest = '''Сохранить выбранные изменения?
+    if finder:
+        answer = questions("Какую из найденых записей нужно изменить?\n")
+        if answer > 0 and answer <= len(finder):
+            index = finder[answer-1]
+        temp_dict = my_dict[index].copy()
+        for key in temp_dict.keys():
+            new_value = input(f'Введите новое значение поля "{key}" Или Enter для пропуска\n')
+            if new_value:
+                temp_dict[key] = new_value
+        show_all([temp_dict])
+        quest = '''Сохранить выбранные изменения?
 1. Да
 2. Нет
 '''
-    save_or_not = questions(quest) + 1
-    match save_or_not:
-        case 1:
-            my_dict[index] = temp_dict
+        save_or_not = questions(quest)
+        match save_or_not:
+            case 1:
+                my_dict[index] = temp_dict
 
 def del_contacts():
     global my_dict
-    to_del = find_contact(my_dict)
-    answer = questions("Какую из найденых записей нужно удалить?\n")
-    if answer != 0:
-        result = [my_dict.pop(to_del[answer-1])]
-        print(f"Контакт указанный ниже удален")
-        show_all(result)
-    save_contacts()
+    to_del = find_contact()
+    if to_del:
+        answer = questions("Какую из найденых записей нужно удалить?\n")
+        if answer != 0:
+            result = [my_dict.pop(to_del[answer-1])]
+            print(f"Контакт указанный ниже удален")
+            show_all(result)
+        save_contacts()
 
 def quit():
+    global my_dict
+    global PATH
+    if my_dict != open_phonebook(PATH):
+        quest = ''' Сохранить изменения?
+1. Да
+2. Нет
+'''     
+        answer = questions(quest)
+        if answer == 1:
+            save_contacts()
+            print("Телефонная книга обновлена")
     sys.exit()
 
 def save_contacts():
@@ -126,18 +140,19 @@ def save_contacts():
         for i in my_dict:
             file.write(f'{i["Имя"]};{i["Телефон"]};{i["Комментарий"]}\n')
 
-my_dict = []
-with open('phone_numbers.txt','r') as file:
-    
-    for i in file:
-        print(i)
-        my_list=i.split(';')
-        print(my_list)
-        my_dict.append({'Имя': my_list[0].strip(),
-                        'Телефон': my_list[1].strip(),
-                        'Комментарий': my_list[2].strip()})
-        
-    print(my_dict)
+
+def open_phonebook(path):
+    my_dict = []
+    with open('phone_numbers.txt','r') as file:
+        for i in file:
+            my_list=i.split(';')
+            my_dict.append({'Имя': my_list[0].strip(),
+                            'Телефон': my_list[1].strip(),
+                            'Комментарий': my_list[2].strip()})
+    return my_dict
+
+my_dict = open_phonebook(PATH)
+
 
 
 if __name__ == '__main__':
